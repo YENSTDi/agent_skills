@@ -25,9 +25,13 @@ Ryan 的 1111 人力銀行「❇️ 分享工作區」操作指南。
 │   URL: https://www.notion.so/2a41cc48bc5a80c58520da921c76171b
 │   Data Source: collection://2a41cc48-bc5a-8095-b0a0-000b7bd50d72
 │
-└── 例行事項 (子 Database) - 追蹤例行工作
-    URL: https://www.notion.so/2a41cc48bc5a80aea607ea757c2c2bb3
-    Data Source: collection://2a41cc48-bc5a-802b-bf70-000b8fd61c68
+├── 例行事項 (子 Database) - 追蹤例行工作
+│   URL: https://www.notion.so/2a41cc48bc5a80aea607ea757c2c2bb3
+│   Data Source: collection://2a41cc48-bc5a-802b-bf70-000b8fd61c68
+│
+└── Data Pipeline (子 Database) - 資料管線文件
+    URL: https://www.notion.so/2ca1cc48bc5a8031a313c7c50af1fb97
+    Data Source: collection://2ca1cc48-bc5a-800a-b8bf-000bc5bdfc99
 ```
 
 ## Database Schema
@@ -48,6 +52,18 @@ Ryan 的 1111 人力銀行「❇️ 分享工作區」操作指南。
 |------|------|
 | Name | title |
 
+### Data Pipeline
+| 欄位 | 類型 |
+|------|------|
+| Name | title |
+| Code | url |
+
+#### 現有頁面
+| 名稱 | 頁面 ID | 說明 |
+|------|---------|------|
+| 求職者履歷資料 | 2ca1cc48bc5a80deaa9de449cbb302bd | MSSQL → DynamoDB (1111TalentResume) |
+| 求職者求職歷史紀錄 | 2ca1cc48bc5a810b80e6c30e4cc8b1e9 | MSSQL → DynamoDB (1111TalentHistory) |
+
 ## 快速操作
 
 ### 搜尋
@@ -58,8 +74,11 @@ notion-search(page_url="2a41cc48bc5a806a84d6f1e053849e36", query="關鍵字")
 # 搜尋工作事項
 notion-search(data_source_url="collection://2a41cc48-bc5a-8095-b0a0-000b7bd50d72", query="關鍵字")
 
-# 搜尋例行事項  
+# 搜尋例行事項
 notion-search(data_source_url="collection://2a41cc48-bc5a-802b-bf70-000b8fd61c68", query="關鍵字")
+
+# 搜尋 Data Pipeline
+notion-search(data_source_url="collection://2ca1cc48-bc5a-800a-b8bf-000bc5bdfc99", query="關鍵字")
 ```
 
 ### 新增工作事項
@@ -89,6 +108,20 @@ notion-create-pages(
 )
 ```
 
+### 新增 Data Pipeline
+```python
+notion-create-pages(
+  parent={"data_source_id": "2ca1cc48-bc5a-800a-b8bf-000bc5bdfc99"},
+  pages=[{
+    "properties": {
+      "Name": "管線名稱",
+      "Code": "https://github.com/..."
+    },
+    "content": "## 概述\n說明...\n\n---\n\n## 資料來源\n<table>...</table>"
+  }]
+)
+```
+
 ### 更新頁面
 ```python
 # 更新屬性
@@ -112,3 +145,53 @@ notion-update-page(data={
 - Multi-select: JSON array 字串 `"[\"選項1\", \"選項2\"]"`
 - 「分享工作區」本身是 Wiki，屬性無法透過 API 更新
 - 更新前先 `notion-fetch` 讀取現有內容
+
+## Data Pipeline 頁面格式
+
+參考「求職者求職歷史紀錄」頁面格式：
+```markdown
+## 概述
+說明...
+- **目標表**: `TableName` (region)
+- **執行位置**: 地端主機 IP
+- **排程**: 說明
+
+---
+
+## 資料來源
+<table header-row="true">...</table>
+
+---
+
+## DynamoDB 結構
+```javascript
+Table: TableName
+├── PK: ...
+└── SK: ...
+```
+
+---
+
+## 查詢模式
+```python
+# 範例查詢
+```
+
+---
+
+## 使用方式
+```bash
+# 全量/增量同步指令
+```
+
+---
+
+## 特性
+- 特性 1
+- 特性 2
+
+---
+
+## 資料保留
+- 說明...
+```
